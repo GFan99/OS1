@@ -36,7 +36,7 @@ public class Indexer {
 	}
 	
 	public void start() {
-		File ordner = pfadNachOS("","");
+		File ordner = new File("../Texte");
 		File[] dateien = ordner.listFiles();
 		StringBuilder sb = new StringBuilder();
 		try {
@@ -67,7 +67,7 @@ public class Indexer {
 	
 	public void sortpartfiles() {
 		ArrayList<String> tmplist = new ArrayList<String>();
-		File ordner = pfadNachOS("tmp","");
+		File ordner = new File("../Texte/tmp");
 		File[] dateien = ordner.listFiles();
 		try {
 			for (int i =0;i<dateien.length;i++) {
@@ -114,7 +114,7 @@ public class Indexer {
 	public void writePartFile() {
 		partcounter++;
 		try {
-			Files.write(Paths.get(pfadNachOS("tmp","").getPath(),"partfile"+partcounter+".txt"), indexliste);
+			Files.write(Paths.get("../Texte/tmp/partfile"+partcounter+".txt"), indexliste);
 			indexliste.clear();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -130,7 +130,7 @@ public class Indexer {
 				print.add(sortliste.remove(linecounter));
 			}
 			try {
-				Files.write(Paths.get(pfadNachOS("sorted","").getPath(),"sortedfile"+sortpartcounter+".txt"), print);
+				Files.write(Paths.get("../Texte/sorted/sortedfile"+sortpartcounter+".txt"), print);
 				print.clear();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -141,8 +141,8 @@ public class Indexer {
 	
 	public void writeLexika() {
 		try {
-			Files.write(Paths.get(pfadNachOS("Lexika","doks.txt").getPath()), doklexikon);
-			Files.write(Paths.get(pfadNachOS("Lexika","terme.txt").getPath()), termlexikon);
+			Files.write(Paths.get("../Texte/Lexika/doks.txt"), doklexikon);
+			Files.write(Paths.get("../Texte/Lexika/terme.txt"), termlexikon);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
