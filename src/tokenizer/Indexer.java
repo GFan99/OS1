@@ -176,14 +176,14 @@ public class Indexer {
 			if (dateiname!="") {
 				dateiname="//"+dateiname;
 			}
-			return new File(pfad+"//Texte//"+ordnername+dateiname);
+			return new File(pfad+"//OS1//Texte//"+ordnername+dateiname);
 		}
 		else {
 			ordnername=ordnername+"/";
 			if (dateiname!="") {
 				dateiname="/"+dateiname;
 			}
-			return new File("./Texte/"+ordnername+dateiname);
+			return new File("./OS1/Texte/"+ordnername+dateiname);
 		}		
 	}
 }
