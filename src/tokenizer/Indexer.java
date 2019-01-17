@@ -2,6 +2,7 @@ package tokenizer;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,9 +36,27 @@ public class Indexer {
 		this.start();
 	}
 	
+	/**
+	 * Muster für FileFilter
+	 * 
+	 * File testDirectory = new File("C://rootDir//");
+	 * File[] files = testDirectory.listFiles(new FileFilter() {
+	 *     @Override
+	 *     public boolean accept(File pathname) {
+	 *     		String name = pathname.getName().toLowerCase();
+	 *          return name.endsWith(".xml") && pathname.isFile();
+	 *     }
+	 * });
+	 */
+	
 	public void start() {
 		File ordner = new File("../Texte");
-		File[] dateien = ordner.listFiles();
+		File[] dateien = ordner.listFiles(new FileFilter() {
+		    @Override
+		    public boolean accept(File pathname) {
+		        return pathname.isFile();
+		    }
+		});		
 		StringBuilder sb = new StringBuilder();
 		try {
 			for (int i =0;i<dateien.length;i++) {
