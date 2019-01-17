@@ -1,13 +1,17 @@
 package tokenizer;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
@@ -82,37 +86,74 @@ public class Indexer {
 		}
 		catch (Exception e) {e.printStackTrace();}
 		this.sortpartfiles();
+		this.globalSort();
 	}
 	
 	public void sortpartfiles() {
 		ArrayList<String> tmplist = new ArrayList<String>();
 		File ordner = new File("../Texte/tmp");
 		File[] dateien = ordner.listFiles();
+		partcounter=0;
 		try {
 			for (int i =0;i<dateien.length;i++) {
 				BufferedReader br = new BufferedReader(new FileReader(dateien[i]));
+				File datei = dateien[i];
 				String line = br.readLine();
 				while (line != null) {
 					tmplist.add(line);
 					line = br.readLine();
 				}
 				br.close();
+				Collections.sort(tmplist, new Comparator<String>() {
+
+					@Override
+					public int compare(String o1, String o2) {
+						Integer i1 = Integer.parseInt(o1.split(",")[0]);
+						Integer i2 = Integer.parseInt(o2.split(",")[0]);
+						
+						return i1.compareTo(i2);
+					}
+					
+				});
+				writePartFile(tmplist, datei);
+				partcounter++;
 			}
+			
 		}
-		catch (Exception e) {e.printStackTrace();}
-		ArrayList<ArrayList<String>> tmparray = new ArrayList<ArrayList<String>>();
-		for(int i=0;i<doklexikon.size();i++) {
-			ArrayList<String> newlist = new ArrayList<String>();
-			tmparray.add(newlist);
+		catch(Exception e) {}
+	}
+	
+	public void globalSort() {
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File("../Texte/sorted/sortfile.txt")));
+			ArrayList<BufferedReader> brlist = new ArrayList<BufferedReader>();
+			File ordner = new File("../Texte/tmp");
+			File[] dateien = ordner.listFiles();
+			for (int i =0;i<dateien.length;i++) {
+				BufferedReader br = new BufferedReader(new FileReader(dateien[i]));
+				brlist.add(br);	
+			}
+			String zeile;
+			for(int i=0;i<termlexikon.size()-1;i++) {
+				for(int j=0;j<brlist.size();j++) {
+					BufferedReader brx=brlist.get(j);
+					brx.mark(7);
+					zeile=brx.readLine();
+					while(zeile!=null && Integer.parseInt(zeile.split(",")[0]) == i) {
+						bw.write(zeile);
+						bw.newLine();
+						brx.mark(7);
+						zeile=brx.readLine();
+					}
+					brlist.get(j).reset();
+				}
+			}
+			bw.close();
+		} 
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		for(int i=0;i<tmplist.size();i++) {
-			String[] tmp = tmplist.get(i).split(",");
-			tmparray.get(Integer.parseInt(tmp[1])).add(tmp[0]+","+tmp[1]+","+tmp[2]);
-		}
-		for(int i=0;i<tmparray.size();i++) {
-			sortliste.addAll(tmparray.get(i));
-		}
-		writeSortedFile();
 	}
 	
 	public void addDocument(String source, TreeMap<String,Integer> frequenz) {
@@ -120,7 +161,8 @@ public class Indexer {
 		int dokid = doklexikon.size()-1;
 		for (String key:frequenz.descendingKeySet()) {
 			if (indexliste.size() >= 150) {
-				writePartFile();
+				writePartFile(indexliste,new File("../Texte/tmp/partfile"+partcounter+".txt"));
+				partcounter++;
 			}
 			if (!termlexikon.contains(key)) {
 				termlexikon.add(key);
@@ -130,11 +172,11 @@ public class Indexer {
 		}		
 	}
 	
-	public void writePartFile() {
-		partcounter++;
+	public void writePartFile(ArrayList<String> liste, File datei) {
+		
 		try {
-			Files.write(Paths.get("../Texte/tmp/partfile"+partcounter+".txt"), indexliste);
-			indexliste.clear();
+			Files.write(Paths.get(datei.getAbsolutePath()), liste);
+			liste.clear();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -176,14 +218,14 @@ public class Indexer {
 			if (dateiname!="") {
 				dateiname="//"+dateiname;
 			}
-			return new File(pfad+"//OS1//Texte//"+ordnername+dateiname);
+			return new File(pfad+"//Texte//"+ordnername+dateiname);
 		}
 		else {
 			ordnername=ordnername+"/";
 			if (dateiname!="") {
 				dateiname="/"+dateiname;
 			}
-			return new File("./OS1/Texte/"+ordnername+dateiname);
+			return new File("./Texte/"+ordnername+dateiname);
 		}		
 	}
 }
